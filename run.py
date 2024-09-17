@@ -32,7 +32,7 @@ async def command_start_handler(message: types.Message) -> None:
 
 @dp.message(F.content_type == ContentType.TEXT)
 async def handler_name(message: types.Message) -> None:
-    text = message.text
+    text = message.text.upper()
     data = await get_student_info(text)
     if not data and data.get('error'):
         await message.reply(data['error'])
@@ -56,7 +56,7 @@ async def handler_name(message: types.Message) -> None:
 @dp.callback_query(lambda callback: callback.data.startswith('result_'))
 async def options_test_handler(callback: types.CallbackQuery, state: FSMContext) -> None:
     text = callback.data.split('_')
-    data = await get_student_info(text[-1])
+    data = await get_student_info(text[-1].upper())
     month = text[1]
     response = ""
     total_percentage = 0

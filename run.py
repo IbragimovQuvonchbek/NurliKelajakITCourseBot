@@ -2,9 +2,8 @@ import asyncio
 import logging
 import os
 import sys
-from calendar import day_abbr
-from pyexpat.errors import messages
-
+from uuid import uuid4
+import matplotlib.pyplot as plt
 from aiogram import Bot, Dispatcher, F, html
 from aiogram import types
 from aiogram.client.default import DefaultBotProperties
@@ -18,6 +17,8 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemo
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from dotenv import load_dotenv
 from functionsapi import get_student_info
+from aiogram.types import FSInputFile
+
 
 load_dotenv()
 
@@ -77,12 +78,37 @@ async def options_test_handler(callback: types.CallbackQuery, state: FSMContext)
             await callback.message.answer(months_arr[key])
 
     else:
+        x = []
+        y = []
         for result in data:
             if result['month'] == month:
                 total_percentage += round(result['result']/result['number_of_questions']*100)
+                y.append(round(result['result']/result['number_of_questions']*100))
                 times += 1
+                x.append(times)
                 response += f"{result['number_of_questions']}/{result['result']} --- {round(result['result']/result['number_of_questions']*100)}%\n"
         await callback.message.answer(response)
+
+        try:
+            plt.plot(x, y, marker='o', linestyle='-', color='b', label=f"{month} oyi o'zlashtirish natijasi")
+
+            plt.title(f"{month} oyi o'zlashtirish natijasi", fontsize=16)
+            plt.xlabel('Test Tartib Raqami', fontsize=12)
+            plt.ylabel('Foiz %', fontsize=12)
+            plt.xticks(x, fontsize=10)
+            plt.grid(True, which='both', linestyle='--', linewidth=0.7, alpha=0.7)
+            file_name = uuid4()
+            plt.savefig(f'linegraphs/{file_name}.png', dpi=300, bbox_inches='tight')
+
+            plt.close()
+            photo = FSInputFile(f'linegraphs/{file_name}.png')
+            await callback.message.answer_photo(photo, caption=f"{month} oyi o'zlashtirish natijasi")
+            try:
+                os.remove(f'linegraphs/{file_name}.png')
+            except OSError as e:
+                pass
+        except Exception as e:
+            await callback.message.answer("Grafik chizishda xatolik")
 
     await callback.message.answer(f"{month} -- {round(total_percentage/times, 2)}%")
 

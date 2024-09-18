@@ -3,6 +3,8 @@ import logging
 import os
 import sys
 from uuid import uuid4
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from aiogram import Bot, Dispatcher, F, html
 from aiogram import types
@@ -21,7 +23,6 @@ from aiogram.types import FSInputFile
 
 
 load_dotenv()
-plt.use('Agg')
 
 TOKEN = os.getenv("TOKEN")
 dp = Dispatcher(storage=MemoryStorage())

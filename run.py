@@ -91,43 +91,26 @@ async def options_test_handler(callback: types.CallbackQuery, state: FSMContext)
                 response += f"{result['number_of_questions']}/{result['result']} --- {round(result['result']/result['number_of_questions']*100)}%\n"
         await callback.message.answer(response)
 
-        # try:
-        #     plt.plot(x, y, marker='o', linestyle='-', color='b', label=f"{month} oyi o'zlashtirish natijasi")
-        #
-        #     plt.title(f"{month} oyi o'zlashtirish natijasi", fontsize=16)
-        #     plt.xlabel('Test Tartib Raqami', fontsize=12)
-        #     plt.ylabel('Foiz %', fontsize=12)
-        #     plt.xticks(x, fontsize=10)
-        #     plt.grid(True, which='both', linestyle='--', linewidth=0.7, alpha=0.7)
-        #     file_name = uuid4()
-        #     plt.savefig(f'linegraphs/{file_name}.png', dpi=300, bbox_inches='tight')
-        #
-        #     plt.close()
-        #     photo = FSInputFile(f'linegraphs/{file_name}.png')
-        #     await callback.message.answer_photo(photo, caption=f"{month} oyi o'zlashtirish natijasi")
-        #     try:
-        #         os.remove(f'linegraphs/{file_name}.png')
-        #     except OSError as e:
-        #         pass
-        # except Exception as e:
-        #     await callback.message.answer("Grafik chizishda xatolik")
-        plt.plot(x, y, marker='o', linestyle='-', color='b', label=f"{month} oyi o'zlashtirish natijasi")
-
-        plt.title(f"{month} oyi o'zlashtirish natijasi", fontsize=16)
-        plt.xlabel('Test Tartib Raqami', fontsize=12)
-        plt.ylabel('Foiz %', fontsize=12)
-        plt.xticks(x, fontsize=10)
-        plt.grid(True, which='both', linestyle='--', linewidth=0.7, alpha=0.7)
-        file_name = uuid4()
-        plt.savefig(f'linegraphs/{file_name}.png', dpi=300, bbox_inches='tight')
-
-        plt.close()
-        photo = FSInputFile(f'linegraphs/{file_name}.png')
-        await callback.message.answer_photo(photo, caption=f"{month} oyi o'zlashtirish natijasi")
         try:
-            os.remove(f'linegraphs/{file_name}.png')
-        except OSError as e:
-            pass
+            plt.plot(x, y, marker='o', linestyle='-', color='b', label=f"{month} oyi o'zlashtirish natijasi")
+
+            plt.title(f"{month} oyi o'zlashtirish natijasi", fontsize=16)
+            plt.xlabel('Test Tartib Raqami', fontsize=12)
+            plt.ylabel('Foiz %', fontsize=12)
+            plt.xticks(x, fontsize=10)
+            plt.grid(True, which='both', linestyle='--', linewidth=0.7, alpha=0.7)
+            file_name = uuid4()
+            plt.savefig(f'linegraphs/{file_name}.png', dpi=300, bbox_inches='tight')
+
+            plt.close()
+            photo = FSInputFile(f'linegraphs/{file_name}.png')
+            await callback.message.answer_photo(photo, caption=f"{month} oyi o'zlashtirish natijasi")
+            try:
+                os.remove(f'linegraphs/{file_name}.png')
+            except OSError as e:
+                pass
+        except Exception as e:
+            await callback.message.answer("Grafik chizishda xatolik")
 
     await callback.message.answer(f"{month} -- {round(total_percentage/times, 2)}%")
 

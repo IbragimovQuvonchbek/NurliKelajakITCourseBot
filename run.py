@@ -21,6 +21,7 @@ from aiogram.types import FSInputFile
 
 
 load_dotenv()
+plt.use('Agg')
 
 TOKEN = os.getenv("TOKEN")
 dp = Dispatcher(storage=MemoryStorage())

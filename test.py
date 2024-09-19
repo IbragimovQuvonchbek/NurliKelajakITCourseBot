@@ -1,6 +1,6 @@
-import aiohttp
-from PIL import Image, ImageDraw, ImageFont
+from uuid import uuid4
 
+from PIL import Image, ImageDraw, ImageFont
 
 def create_table_image(headers, data, output_file):
     # Define some parameters
@@ -32,31 +32,18 @@ def create_table_image(headers, data, output_file):
     # Save the image as a PNG file
     image.save(output_file)
 
+# Test numbers and results
+x = [1, 2, 3, 4]
+y = [100, 80, 0, 89]
 
-async def get_student_info(params):
-    url = f"http://13.60.228.133/api/v1/courseit/results/?ids={params}"
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url) as response:
-            return await response.json()
+# Combine the test numbers and results into rows
+data = list(zip(x, y))
 
+# Headers for the table
+headers = ["Test raqami", "Natija %"]
 
-def print_table(headers, data):
-    # Calculate column widths
-    col_widths = [max(len(str(item)) for item in column) for column in zip(headers, *data)]
+# Output file name
+output_file = f"{uuid4()}.png"
 
-    # Create a format string for the table
-    header_format = '| ' + ' | '.join(f'{{:<{w}}}' for w in col_widths) + ' |'
-    separator = '+=' + '=+='.join('=' * w for w in col_widths) + '=+'
-
-    # Print the headers
-    result = ""
-    result += f"{separator}\n"
-    result += f"{header_format.format(*headers)}\n"
-    result += f"{separator}\n"
-
-    # Print each row
-    for row in data:
-        result += f"{header_format.format(*row)}\n"
-    result += f"{separator}\n"
-
-    return result
+# Create the table image
+create_table_image(headers, data, output_file)

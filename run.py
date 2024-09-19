@@ -6,6 +6,7 @@ from uuid import uuid4
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+from tabulate import tabulate
 from aiogram import Bot, Dispatcher, F, html
 from aiogram import types
 from aiogram.client.default import DefaultBotProperties
@@ -18,7 +19,7 @@ from aiogram.types import ContentType
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from dotenv import load_dotenv
-from functionsapi import get_student_info
+from functionsapi import get_student_info, print_table, create_table_image
 from aiogram.types import FSInputFile
 
 
@@ -31,6 +32,10 @@ dp = Dispatcher(storage=MemoryStorage())
 @dp.message(CommandStart())
 async def command_start_handler(message: types.Message) -> None:
     await message.answer(f"{html.bold("Assalomu Aleykum!\nO'quvchining natijasni bilish uchun ID raqamini jo'nating")}")
+    await message.answer(
+        '<a href="https://docs.google.com/spreadsheets/d/16QEg1F2j4gyzTPPaNtOQvvE9S4zM_p1Wp5O3wbOLERc/edit?usp=sharing">O`quvchilar ro`yxati</a>',
+        parse_mode=ParseMode.HTML
+    )
 
 
 @dp.message(F.content_type == ContentType.TEXT)
@@ -88,11 +93,23 @@ async def options_test_handler(callback: types.CallbackQuery, state: FSMContext)
                 y.append(round(result['result']/result['number_of_questions']*100))
                 times += 1
                 x.append(times)
-                response += f"{result['number_of_questions']}/{result['result']} --- {round(result['result']/result['number_of_questions']*100)}%\n"
-        await callback.message.answer(response)
-
+                # response += f"{result['number_of_questions']}/{result['result']} --- {round(result['result']/result['number_of_questions']*100)}%\n"
+        table = list(zip(x, y))
+        # response = (tabulate(table, headers=["Test raqami", "Natija %"], tablefmt="grid"))
+        # response = print_table(headers=["Test raqami", "Natija %"], data=table)
+        table_file_path = uuid4()
         try:
-            plt.plot(x, y, marker='o', linestyle='-', color='b', label=f"{month} oyi o'zlashtirish natijasi")
+            create_table_image(["Test raqami", "Natija %"], table, f"{table_file_path}.png")
+            photo = FSInputFile(f'{table_file_path}.png')
+            await callback.message.answer_photo(photo, caption=f"{html.italic(f'{month} oyi o`zlashtirish natijasi')}")
+            try:
+                os.remove(f'{table_file_path}.png')
+            except OSError as e:
+                pass
+        except Exception:
+            await callback.message.answer("Ma'lumotni olishda xatolik")
+        try:
+            plt.plot(x, y, marker='o', linestyle='-', color='b', label=f"{html.italic(f'{month} oyi o`zlashtirish natijasi')}")
 
             plt.title(f"{month} oyi o'zlashtirish natijasi", fontsize=16)
             plt.xlabel('Test Tartib Raqami', fontsize=12)
@@ -104,7 +121,7 @@ async def options_test_handler(callback: types.CallbackQuery, state: FSMContext)
 
             plt.close()
             photo = FSInputFile(f'linegraphs/{file_name}.png')
-            await callback.message.answer_photo(photo, caption=f"{month} oyi o'zlashtirish natijasi")
+            await callback.message.answer_photo(photo, caption=f"{html.italic(f'{month} oyi o`zlashtirish natijasi')}")
             try:
                 os.remove(f'linegraphs/{file_name}.png')
             except OSError as e:
@@ -112,7 +129,7 @@ async def options_test_handler(callback: types.CallbackQuery, state: FSMContext)
         except Exception as e:
             await callback.message.answer("Grafik chizishda xatolik")
 
-    await callback.message.answer(f"{month} -- {round(total_percentage/times, 2)}%")
+    await callback.message.answer(f"{html.italic(f'{month} o`rtacha foizi-- {round(total_percentage/times, 2)}%')}")
 
 
 async def main() -> None:

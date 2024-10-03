@@ -52,8 +52,8 @@ async def handler_name(message: types.Message) -> None:
                         f"ID: {data[0]['student']['id_unique']}")
         builder = InlineKeyboardBuilder()
         keys = []
-        builder.button(text="Jami",
-                       callback_data=f"result_{"Jami"}_{text}")
+        # builder.button(text="Jami",
+        #                callback_data=f"result_{"Jami"}_{text}")
         for result in data:
             if result['month'] not in keys:
                 keys.append(result['month'])
